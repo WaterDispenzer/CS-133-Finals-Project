@@ -1,0 +1,33 @@
+import pandas as pd
+from nltk import word_tokenize, pos_tag
+
+# Read the Excel file (make sure this file is in the same folder as this script,
+# or replace with the full path e.g. "C:/Users/YourName/Documents/List_of_Kankanaey_Sentences.xlsx")
+df = pd.read_excel("List of Kankanaey Sentences.xlsx")
+
+# Grab only the English sentences column
+sentences = df["Sentence in English"]
+
+results = []
+
+for sentence in sentences:
+    # Skip empty/NaN rows
+    if pd.isna(sentence):
+        continue
+
+    words = word_tokenize(str(sentence))
+    tagged = pos_tag(words)
+
+    print("\nSentence:")
+    print(sentence)
+    print(tagged)
+
+    # Save each word/tag pair as a string like "I/PRP love/VBP you/PRP ./."
+    tagged_str = " ".join(f"({word} | {tag})" for word, tag in tagged)
+    results.append(tagged_str)
+
+# Put the results back into the dataframe and save to a new Excel file
+df["POS Tagged (English)"] = pd.Series(results)
+df.to_excel("List_of_Kankanaey_Sentences_POS_tagged.xlsx", index=False)
+
+print("\nDone! Saved to List_of_Kankanaey_Sentences_POS_tagged.xlsx")
